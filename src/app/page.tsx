@@ -1,30 +1,33 @@
 'use client';
 
-import { useSpring, animated } from '@react-spring/web'; // animated를 import 해야 함
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { animated, useSpring } from '@react-spring/web';
 
-const Page = () => {
-  const [toggle, setToggle] = useState(false);
-
+function AnimatedNumberReactSpring({ value }: { value: number }) {
   const props = useSpring({
-    from: { opacity: 0 }, // 초기 opacity는 0
-    to: { opacity: 1 }, // 최종 opacity는 1
+    from: { number: 0 },
+    to: { number: value },
+    config: { tension: 200, friction: 20 },
   });
+  return <animated.span>{props.number.to((n) => n.toFixed(0))}</animated.span>;
+}
+
+function App() {
+  const [num, setNum] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const newNum = (Math.random() * 100).toFixed();
+      setNum(parseInt(newNum));
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <div className="p-4 flex justify-center items-center text-center">
-      <div onClick={() => setToggle(!toggle)} className="cursor-pointer ">
-        <animated.div
-          className="bg-blue-500 h-16 border border-black rounded-xl"
-          style={props}
-        >
-          <animated.div className="text-white">
-            {props.opacity.to((x) => x.toFixed(2))}
-          </animated.div>
-        </animated.div>
-      </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <span>{num}</span>
+      <AnimatedNumberReactSpring value={num} />
     </div>
   );
-};
+}
 
-export default Page;
+export default App;
